@@ -1,6 +1,7 @@
 // Painel lateral de sessao (agenda). Aberto via ?session={id} na URL,
 // espelhando o comportamento do SessionPanel.tsx original: fetch dos
-// detalhes, edicao inline, salvar (PUT), excluir (DELETE com confirmacao).
+// detalhes, edicao inline, reagendar, cancelar, salvar (PUT), excluir
+// (DELETE com confirmacao).
 
 (function () {
   "use strict";
@@ -13,6 +14,10 @@
   var errorEl = document.getElementById("session-panel-error");
   var contentEl = document.getElementById("session-panel-content");
   var currentSession = null;
+
+  var RESCHEDULABLE_STATUSES = ["livre", "pendente", "confirmado"];
+  var CANCELLED_STATUSES = ["cancelado_cobrado", "cancelado_sem_cobranca"];
+  var REQUESTED_BY_LABELS = { paciente: "Paciente", profissional: "Profissional" };
 
   function getSessionIdFromUrl() {
     var params = new URLSearchParams(window.location.search);
@@ -34,12 +39,31 @@
     return datePart + "T" + timePart;
   }
 
+  function formatDateTimeLabel(datetime) {
+    var parts = (datetime || "").split(" ");
+    var datePart = parts[0] || "";
+    var timePart = (parts[1] || "").slice(0, 5);
+    var d = new Date(datePart + "T00:00:00");
+    var months = ["Janeiro", "Fevereiro", "Marco", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+    return d.getDate() + " de " + months[d.getMonth()] + " de " + d.getFullYear() + " as " + timePart;
+  }
+
+  function resetSubForms() {
+    document.getElementById("session-panel-reschedule-block").classList.add("hidden");
+    document.getElementById("session-panel-reschedule-form").classList.add("hidden");
+    document.getElementById("session-panel-reschedule-form").classList.remove("flex");
+    document.getElementById("session-panel-cancel-block").classList.add("hidden");
+    document.getElementById("session-panel-cancel-form").classList.add("hidden");
+    document.getElementById("session-panel-cancel-form").classList.remove("flex");
+  }
+
   function open(sessionId) {
     overlay.classList.remove("hidden");
     loadingEl.classList.remove("hidden");
     errorEl.classList.add("hidden");
     contentEl.classList.add("hidden");
     contentEl.classList.remove("flex");
+    resetSubForms();
 
     fetch(base + "/api/sessions/" + sessionId)
       .then(function (res) { return res.json().then(function (data) { return { ok: res.ok, data: data }; }); })
@@ -85,6 +109,77 @@
 
     document.getElementById("panel-sendConfirmation").checked = Boolean(session.send_confirmation);
     document.getElementById("panel-sendReminders").checked = Boolean(session.send_reminders);
+
+    // Banners de reagendamento
+    var toEl = document.getElementById("session-panel-rescheduled-to");
+    if (session.rescheduled_to) {
+      toEl.textContent = "Reagendado para " + formatDateTimeLabel(session.rescheduled_to.scheduled_at) + " →";
+      toEl.href = "?session=" + session.rescheduled_to.id;
+      toEl.classList.remove("hidden");
+    } else {
+      toEl.classList.add("hidden");
+    }
+
+    var fromEl = document.getElementById("session-panel-rescheduled-from");
+    if (session.rescheduled_from) {
+      document.getElementById("session-panel-rescheduled-from-main").textContent =
+        "← Reagendado de " + formatDateTimeLabel(session.rescheduled_from.scheduled_at);
+      document.getElementById("session-panel-rescheduled-from-detail").textContent =
+        "Motivo: " + session.rescheduled_from.reason + " · Solicitado por " +
+        (REQUESTED_BY_LABELS[session.rescheduled_from.requested_by] || session.rescheduled_from.requested_by) +
+        " · " + (session.rescheduled_from.charged ? "Com cobranca" : "Sem cobranca");
+      fromEl.href = "?session=" + session.rescheduled_from.original_session_id;
+      fromEl.classList.remove("hidden");
+      fromEl.classList.add("flex");
+    } else {
+      fromEl.classList.add("hidden");
+      fromEl.classList.remove("flex");
+    }
+
+    // Link "Registro de sessao"
+    var canWriteNote = session.has_note || session.status === "confirmado";
+    var noteLink = document.getElementById("session-panel-note-link");
+    if (canWriteNote) {
+      noteLink.href = base + "/agenda/" + session.id + "/registro";
+      noteLink.classList.remove("hidden");
+    } else {
+      noteLink.classList.add("hidden");
+    }
+
+    // Bloco de reagendamento
+    var rescheduleBlock = document.getElementById("session-panel-reschedule-block");
+    if (RESCHEDULABLE_STATUSES.indexOf(session.status) !== -1) {
+      rescheduleBlock.classList.remove("hidden");
+      rescheduleBlock.classList.add("flex");
+      document.getElementById("reschedule-newScheduledAt").value = toDatetimeLocalInput(session.scheduled_at);
+      document.getElementById("reschedule-reason").value = "";
+      document.getElementById("reschedule-requestedBy").value = "paciente";
+      document.getElementById("reschedule-charged").checked = false;
+    } else {
+      rescheduleBlock.classList.add("hidden");
+      rescheduleBlock.classList.remove("flex");
+    }
+
+    // Bloco de cancelamento
+    var cancelBlock = document.getElementById("session-panel-cancel-block");
+    var existingReasonEl = document.getElementById("cancel-existing-reason");
+    var cancelOpenBtn = document.getElementById("cancel-open");
+    if (session.status !== "reagendado") {
+      cancelBlock.classList.remove("hidden");
+      cancelBlock.classList.add("flex");
+      document.getElementById("cancel-reason").value = session.cancellation_reason || "";
+      document.getElementById("cancel-charged").checked = session.status === "cancelado_cobrado";
+      if (CANCELLED_STATUSES.indexOf(session.status) !== -1 && session.cancellation_reason) {
+        existingReasonEl.textContent = "Motivo do cancelamento: " + session.cancellation_reason;
+        existingReasonEl.classList.remove("hidden");
+      } else {
+        existingReasonEl.classList.add("hidden");
+      }
+      cancelOpenBtn.textContent = CANCELLED_STATUSES.indexOf(session.status) !== -1 ? "Editar cancelamento" : "Cancelar sessao";
+    } else {
+      cancelBlock.classList.add("hidden");
+      cancelBlock.classList.remove("flex");
+    }
   }
 
   function togglePlatformLink() {
@@ -149,6 +244,102 @@
         return;
       }
       window.location.reload();
+    });
+  });
+
+  // --- Reagendamento ---
+  document.getElementById("reschedule-open").addEventListener("click", function () {
+    document.getElementById("session-panel-reschedule-form").classList.remove("hidden");
+    document.getElementById("session-panel-reschedule-form").classList.add("flex");
+    this.classList.add("hidden");
+  });
+  document.getElementById("reschedule-close").addEventListener("click", function () {
+    document.getElementById("session-panel-reschedule-form").classList.add("hidden");
+    document.getElementById("session-panel-reschedule-form").classList.remove("flex");
+    document.getElementById("reschedule-open").classList.remove("hidden");
+  });
+  document.getElementById("reschedule-confirm").addEventListener("click", function () {
+    if (!currentSession) return;
+    var btn = this;
+    var errEl = document.getElementById("reschedule-error");
+    errEl.classList.add("hidden");
+    btn.disabled = true;
+
+    var payload = {
+      newScheduledAt: document.getElementById("reschedule-newScheduledAt").value,
+      reason: document.getElementById("reschedule-reason").value,
+      requestedBy: document.getElementById("reschedule-requestedBy").value,
+      charged: document.getElementById("reschedule-charged").checked,
+    };
+
+    PsiAgenda.postJSON("/api/sessions/" + currentSession.id + "/reschedule", payload, "POST").then(function (res) {
+      btn.disabled = false;
+      if (!res.ok) {
+        errEl.textContent = res.data.error || "Nao foi possivel reagendar.";
+        errEl.classList.remove("hidden");
+        return;
+      }
+      setUrlSession(res.data.id);
+      window.location.reload();
+    }).catch(function () {
+      btn.disabled = false;
+      errEl.textContent = "Erro de conexao.";
+      errEl.classList.remove("hidden");
+    });
+  });
+
+  // --- Cancelamento ---
+  document.getElementById("cancel-open").addEventListener("click", function () {
+    document.getElementById("session-panel-cancel-form").classList.remove("hidden");
+    document.getElementById("session-panel-cancel-form").classList.add("flex");
+    this.classList.add("hidden");
+  });
+  document.getElementById("cancel-close").addEventListener("click", function () {
+    document.getElementById("session-panel-cancel-form").classList.add("hidden");
+    document.getElementById("session-panel-cancel-form").classList.remove("flex");
+    document.getElementById("cancel-open").classList.remove("hidden");
+  });
+  document.getElementById("cancel-confirm").addEventListener("click", function () {
+    if (!currentSession) return;
+    var btn = this;
+    var errEl = document.getElementById("cancel-error");
+    errEl.classList.add("hidden");
+
+    var reason = document.getElementById("cancel-reason").value.trim();
+    if (!reason) {
+      errEl.textContent = "Informe o motivo do cancelamento.";
+      errEl.classList.remove("hidden");
+      return;
+    }
+    btn.disabled = true;
+
+    var charged = document.getElementById("cancel-charged").checked;
+    var payload = {
+      scheduledAt: document.getElementById("panel-scheduledAt").value,
+      durationMinutes: Number(document.getElementById("panel-duration").value),
+      modality: document.getElementById("panel-modality").value,
+      platformLink: document.getElementById("panel-platformLink").value,
+      status: charged ? "cancelado_cobrado" : "cancelado_sem_cobranca",
+      cancellationReason: reason,
+      sendConfirmation: document.getElementById("panel-sendConfirmation").checked,
+      sendReminders: document.getElementById("panel-sendReminders").checked,
+      reminderLead7Dias: currentSession.reminder_lead_7_dias || "padrao",
+      reminderLead2Dias: currentSession.reminder_lead_2_dias || "padrao",
+      reminderLead24Horas: currentSession.reminder_lead_24_horas || "padrao",
+    };
+
+    PsiAgenda.postJSON("/api/sessions/" + currentSession.id, payload, "PUT").then(function (res) {
+      btn.disabled = false;
+      if (!res.ok) {
+        errEl.textContent = res.data.error || "Nao foi possivel cancelar.";
+        errEl.classList.remove("hidden");
+        return;
+      }
+      window.location.reload();
+    }).catch(function () {
+      btn.disabled = false;
+      errEl.textContent = "Erro de conexao.";
+      errEl.classList.remove("hidden");
     });
   });
 

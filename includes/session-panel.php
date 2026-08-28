@@ -25,6 +25,12 @@
         </a>
       </div>
 
+      <a id="session-panel-rescheduled-to" href="#" class="hidden rounded-md border border-blue-200 bg-blue-50 p-3 text-left text-sm text-blue-800 transition-colors hover:bg-blue-100 dark:border-blue-900 dark:bg-blue-950 dark:text-blue-300 dark:hover:bg-blue-900/60"></a>
+      <a id="session-panel-rescheduled-from" href="#" class="hidden flex-col gap-1 rounded-md border border-slate-200 bg-slate-50 p-3 text-left text-sm text-slate-600 transition-colors hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-300 dark:hover:bg-slate-800">
+        <span id="session-panel-rescheduled-from-main"></span>
+        <span id="session-panel-rescheduled-from-detail" class="text-xs text-slate-500 dark:text-slate-400"></span>
+      </a>
+
       <div class="flex flex-col gap-4">
         <div>
           <label for="panel-scheduledAt" class="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-200">Data e horario</label>
@@ -64,6 +70,60 @@
           <input type="checkbox" id="panel-sendReminders" class="h-4 w-4 rounded border-slate-300 dark:border-slate-600 dark:bg-slate-800">
           Enviar lembretes automaticos
         </label>
+      </div>
+
+      <a id="session-panel-note-link" href="#" class="hidden rounded-md border border-slate-300 bg-white px-4 py-2 text-center text-sm font-medium text-slate-700 transition-all duration-150 ease-out hover:-translate-y-0.5 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800">Registro de sessao</a>
+
+      <div id="session-panel-reschedule-block" class="hidden flex-col gap-2 rounded-md border border-slate-200 p-3 dark:border-slate-700">
+        <div id="session-panel-reschedule-form" class="hidden flex-col gap-2">
+          <p class="text-sm font-medium text-slate-700 dark:text-slate-200">Reagendar sessao</p>
+          <div>
+            <label for="reschedule-newScheduledAt" class="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-200">Nova data e horario</label>
+            <input type="datetime-local" id="reschedule-newScheduledAt" class="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100">
+          </div>
+          <div>
+            <label for="reschedule-reason" class="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-200">Motivo</label>
+            <textarea id="reschedule-reason" rows="2" placeholder="Ex.: Paciente com imprevisto de trabalho" class="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"></textarea>
+          </div>
+          <div>
+            <label for="reschedule-requestedBy" class="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-200">Solicitado por</label>
+            <select id="reschedule-requestedBy" class="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100">
+              <option value="paciente">Paciente</option>
+              <option value="profissional">Profissional</option>
+            </select>
+          </div>
+          <label class="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-200">
+            <input type="checkbox" id="reschedule-charged" class="h-4 w-4 rounded border-slate-300 dark:border-slate-600 dark:bg-slate-800">
+            Houve cobranca pelo reagendamento
+          </label>
+          <p id="reschedule-error" class="hidden text-sm text-red-600 dark:text-red-400"></p>
+          <div class="flex gap-2 pt-1">
+            <button type="button" id="reschedule-confirm" class="rounded-md bg-slate-800 px-4 py-1.5 text-xs font-medium text-white shadow-sm transition-all duration-150 ease-out hover:-translate-y-0.5 hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-slate-100 dark:text-slate-900">Confirmar reagendamento</button>
+            <button type="button" id="reschedule-close" class="rounded-md border border-slate-300 bg-white px-4 py-1.5 text-xs font-medium text-slate-700 transition-all duration-150 ease-out hover:-translate-y-0.5 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200">Fechar</button>
+          </div>
+        </div>
+        <button type="button" id="reschedule-open" class="self-start text-sm font-medium text-blue-700 transition-colors hover:text-blue-800 hover:underline dark:text-blue-400 dark:hover:text-blue-300">Reagendar sessao</button>
+      </div>
+
+      <div id="session-panel-cancel-block" class="hidden flex-col gap-2 rounded-md border border-slate-200 p-3 dark:border-slate-700">
+        <div id="session-panel-cancel-form" class="hidden flex-col gap-2">
+          <p class="text-sm font-medium text-slate-700 dark:text-slate-200">Cancelar sessao</p>
+          <div>
+            <label for="cancel-reason" class="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-200">Motivo do cancelamento</label>
+            <textarea id="cancel-reason" rows="2" placeholder="Ex.: Paciente informou que nao podera comparecer" class="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"></textarea>
+          </div>
+          <label class="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-200">
+            <input type="checkbox" id="cancel-charged" class="h-4 w-4 rounded border-slate-300 dark:border-slate-600 dark:bg-slate-800">
+            Houve cobranca pelo cancelamento
+          </label>
+          <p id="cancel-error" class="hidden text-sm text-red-600 dark:text-red-400"></p>
+          <div class="flex gap-2 pt-1">
+            <button type="button" id="cancel-confirm" class="rounded-md bg-red-600 px-4 py-1.5 text-xs font-medium text-white shadow-sm transition-all duration-150 ease-out hover:-translate-y-0.5 hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60">Confirmar cancelamento</button>
+            <button type="button" id="cancel-close" class="rounded-md border border-slate-300 bg-white px-4 py-1.5 text-xs font-medium text-slate-700 transition-all duration-150 ease-out hover:-translate-y-0.5 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200">Fechar</button>
+          </div>
+        </div>
+        <p id="cancel-existing-reason" class="hidden text-xs text-slate-500 dark:text-slate-400"></p>
+        <button type="button" id="cancel-open" class="self-start text-sm font-medium text-red-600 transition-colors hover:text-red-700 hover:underline dark:text-red-400 dark:hover:text-red-300">Cancelar sessao</button>
       </div>
 
       <div class="mt-auto flex items-center justify-between gap-3 border-t border-slate-100 pt-5 dark:border-slate-800">
