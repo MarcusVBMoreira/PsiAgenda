@@ -118,14 +118,31 @@ if ($tab === 'documentos') {
                      class="inline-flex h-8 w-8 items-center justify-center rounded-md border border-slate-200 text-slate-500 transition-all duration-150 ease-out hover:-translate-y-0.5 hover:border-slate-300 hover:bg-slate-100 hover:text-slate-700 dark:border-slate-700 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:bg-slate-800 dark:hover:text-slate-200">
                     <?php icon('download', 'h-4 w-4'); ?>
                   </a>
+                  <button type="button" class="delete-document-btn inline-flex h-8 w-8 items-center justify-center rounded-md border border-red-200 text-red-600 transition-all duration-150 ease-out hover:-translate-y-0.5 hover:bg-red-50 dark:border-red-900 dark:text-red-400 dark:hover:bg-red-950/40"
+                          data-document-id="<?= h($doc['id']) ?>" title="Excluir documento" aria-label="Excluir documento">
+                    <?php icon('trash-2', 'h-4 w-4'); ?>
+                  </button>
                 </div>
               </div>
             <?php endforeach; ?>
           </div>
         <?php endif; ?>
+
+        <div class="generate-pdf-widget flex flex-col gap-2 rounded-md border border-slate-200 p-3 dark:border-slate-700"
+             data-endpoint="/api/patients/<?= h($patient['id']) ?>/documents" data-redirect="">
+          <label class="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-200">
+            <input type="checkbox" class="gpw-accessible h-4 w-4 rounded border-slate-300 dark:border-slate-600 dark:bg-slate-800">
+            Gerar tambem versao em linguagem acessivel para o paciente
+          </label>
+          <p class="gpw-error hidden text-sm text-red-600 dark:text-red-400"></p>
+          <button type="button" class="gpw-submit self-start rounded-md bg-slate-800 px-4 py-1.5 text-xs font-medium text-white shadow-sm transition-all duration-150 ease-out hover:-translate-y-0.5 hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-slate-100 dark:text-slate-900">Gerar PDF geral do paciente</button>
+        </div>
       </div>
     <?php endif; ?>
   </div>
 </div>
 
+<?php if ($tab === 'documentos'): ?>
+<script src="<?= h(APP_URL) ?>/assets/js/generate-pdf-button.js"></script>
+<?php endif; ?>
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>

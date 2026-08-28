@@ -82,7 +82,23 @@ $canWriteNote = $note !== null || $session['status'] === 'confirmado';
       </p>
     <?php endif; ?>
   </div>
+
+  <?php if ($note !== null): ?>
+    <div class="generate-pdf-widget animate-fade-in-up flex flex-col gap-2 rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900"
+         data-endpoint="/api/sessions/<?= h($session['id']) ?>/documents"
+         data-redirect="<?= h(APP_URL . '/pacientes/' . $session['patient_id'] . '/visualizar?tab=documentos') ?>">
+      <label class="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-200">
+        <input type="checkbox" class="gpw-accessible h-4 w-4 rounded border-slate-300 dark:border-slate-600 dark:bg-slate-800">
+        Gerar tambem versao em linguagem acessivel para o paciente
+      </label>
+      <p class="gpw-error hidden text-sm text-red-600 dark:text-red-400"></p>
+      <button type="button" class="gpw-submit self-start rounded-md bg-slate-800 px-4 py-1.5 text-xs font-medium text-white shadow-sm transition-all duration-150 ease-out hover:-translate-y-0.5 hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-slate-100 dark:text-slate-900">Exportar PDF desta sessao</button>
+    </div>
+  <?php endif; ?>
 </div>
 
 <script src="<?= h(APP_URL) ?>/assets/js/session-note-form.js"></script>
+<?php if ($note !== null): ?>
+<script src="<?= h(APP_URL) ?>/assets/js/generate-pdf-button.js"></script>
+<?php endif; ?>
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
