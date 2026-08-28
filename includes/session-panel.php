@@ -62,6 +62,10 @@
       </div>
 
       <div class="flex flex-col gap-2 rounded-md border border-slate-200 p-3 dark:border-slate-700">
+        <p class="text-sm font-medium text-slate-700 dark:text-slate-200">Confirmacao e lembretes</p>
+        <p id="session-panel-patient-reminders-warning" class="hidden text-xs text-amber-600 dark:text-amber-400">
+          Este paciente esta com envios automaticos desativados nas configuracoes do paciente, mesmo que as opcoes abaixo estejam marcadas.
+        </p>
         <label class="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-200">
           <input type="checkbox" id="panel-sendConfirmation" class="h-4 w-4 rounded border-slate-300 dark:border-slate-600 dark:bg-slate-800">
           Enviar confirmacao automatica quando confirmada
@@ -70,6 +74,12 @@
           <input type="checkbox" id="panel-sendReminders" class="h-4 w-4 rounded border-slate-300 dark:border-slate-600 dark:bg-slate-800">
           Enviar lembretes automaticos
         </label>
+        <p id="session-panel-confirmation-status" class="text-xs text-slate-400 dark:text-slate-500">Confirmacao ainda nao enviada.</p>
+        <div class="flex flex-wrap gap-2 pt-1">
+          <button type="button" id="session-panel-send-confirmation" class="rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 transition-all duration-150 ease-out hover:-translate-y-0.5 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800">Enviar confirmacao agora</button>
+          <button type="button" id="session-panel-send-reminder" class="rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 transition-all duration-150 ease-out hover:-translate-y-0.5 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800">Enviar lembrete agora</button>
+        </div>
+        <p id="session-panel-send-feedback" class="hidden text-xs text-slate-600 dark:text-slate-300"></p>
       </div>
 
       <a id="session-panel-note-link" href="#" class="hidden rounded-md border border-slate-300 bg-white px-4 py-2 text-center text-sm font-medium text-slate-700 transition-all duration-150 ease-out hover:-translate-y-0.5 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800">Registro de sessao</a>

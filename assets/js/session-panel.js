@@ -109,6 +109,11 @@
 
     document.getElementById("panel-sendConfirmation").checked = Boolean(session.send_confirmation);
     document.getElementById("panel-sendReminders").checked = Boolean(session.send_reminders);
+    document.getElementById("session-panel-patient-reminders-warning").classList.toggle("hidden", Boolean(session.patient_reminders_enabled));
+    document.getElementById("session-panel-confirmation-status").textContent = session.confirmation_sent_at
+      ? "Confirmacao enviada em " + formatDateTimeLabel(session.confirmation_sent_at) + "."
+      : "Confirmacao ainda nao enviada.";
+    document.getElementById("session-panel-send-feedback").classList.add("hidden");
 
     // Banners de reagendamento
     var toEl = document.getElementById("session-panel-rescheduled-to");
@@ -340,6 +345,42 @@
       btn.disabled = false;
       errEl.textContent = "Erro de conexao.";
       errEl.classList.remove("hidden");
+    });
+  });
+
+  // --- Envio manual de confirmacao/lembrete ---
+  function showSendFeedback(text) {
+    var el = document.getElementById("session-panel-send-feedback");
+    el.textContent = text;
+    el.classList.remove("hidden");
+  }
+
+  document.getElementById("session-panel-send-confirmation").addEventListener("click", function () {
+    if (!currentSession) return;
+    var btn = this;
+    btn.disabled = true;
+    PsiAgenda.postJSON("/api/sessions/" + currentSession.id + "/send-confirmation", {}, "POST").then(function (res) {
+      btn.disabled = false;
+      showSendFeedback(res.ok ? "Confirmacao enviada." : (res.data.error || "Nao foi possivel enviar."));
+      if (res.ok) {
+        document.getElementById("session-panel-confirmation-status").textContent = "Confirmacao enviada em " + formatDateTimeLabel(new Date().toISOString().slice(0, 10) + " " + new Date().toTimeString().slice(0, 8)) + ".";
+      }
+    }).catch(function () {
+      btn.disabled = false;
+      showSendFeedback("Erro de conexao.");
+    });
+  });
+
+  document.getElementById("session-panel-send-reminder").addEventListener("click", function () {
+    if (!currentSession) return;
+    var btn = this;
+    btn.disabled = true;
+    PsiAgenda.postJSON("/api/sessions/" + currentSession.id + "/send-reminder", {}, "POST").then(function (res) {
+      btn.disabled = false;
+      showSendFeedback(res.ok ? "Lembrete enviado." : (res.data.error || "Nao foi possivel enviar."));
+    }).catch(function () {
+      btn.disabled = false;
+      showSendFeedback("Erro de conexao.");
     });
   });
 
