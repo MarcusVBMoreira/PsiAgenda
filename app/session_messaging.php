@@ -47,15 +47,26 @@ function sendViaEnabledChannels(array $session, string $kind): array
     $email = false;
     $whatsapp = false;
 
+    // Cada canal e resiliente por si — uma falha de SMTP/WhatsApp aqui nunca
+    // pode derrubar a resposta da API com um erro cru (por isso o try/catch
+    // por canal, nao um throw direto pro chamador).
     if ($session['reminder_channel_email'] && $session['patient_email']) {
-        if ($kind === 'confirmation') sendSessionConfirmationEmail($session['patient_email'], $params);
-        else sendSessionReminderEmail($session['patient_email'], $params);
-        $email = true;
+        try {
+            if ($kind === 'confirmation') sendSessionConfirmationEmail($session['patient_email'], $params);
+            else sendSessionReminderEmail($session['patient_email'], $params);
+            $email = true;
+        } catch (MailSendException $e) {
+            error_log('[session-messaging] falha ao enviar e-mail: ' . $e->getMessage());
+        }
     }
     if ($session['reminder_channel_whatsapp'] && $session['patient_phone']) {
-        if ($kind === 'confirmation') sendSessionConfirmationWhatsApp($session['patient_phone'], $params);
-        else sendSessionReminderWhatsApp($session['patient_phone'], $params);
-        $whatsapp = true;
+        try {
+            if ($kind === 'confirmation') sendSessionConfirmationWhatsApp($session['patient_phone'], $params);
+            else sendSessionReminderWhatsApp($session['patient_phone'], $params);
+            $whatsapp = true;
+        } catch (Exception $e) {
+            error_log('[session-messaging] falha ao enviar whatsapp: ' . $e->getMessage());
+        }
     }
 
     return ['email' => $email, 'whatsapp' => $whatsapp];

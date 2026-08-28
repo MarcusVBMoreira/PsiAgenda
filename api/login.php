@@ -26,7 +26,11 @@ if (!$user || !verifyPassword($data['password'], $user['password_hash'])) {
 
 if ((bool) $user['two_factor_enabled']) {
     $code = createVerificationCode($user['id'], 'dois_fatores');
-    sendTwoFactorCodeEmail($data['email'], $code);
+    try {
+        sendTwoFactorCodeEmail($data['email'], $code);
+    } catch (MailSendException $e) {
+        jsonResponse(['error' => $e->getMessage()], 502);
+    }
     createPending2FA($user['id']);
     jsonResponse(['requires2FA' => true]);
 }

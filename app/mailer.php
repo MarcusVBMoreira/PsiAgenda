@@ -11,6 +11,11 @@ require_once __DIR__ . '/config.php';
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception as PHPMailerException;
 
+// Erro de envio de e-mail — sempre pego pelas rotas que chamam sendMail(),
+// nunca deixado estourar cru (isso quebraria a resposta JSON da API,
+// devolvendo uma pagina de erro em HTML pro frontend).
+class MailSendException extends Exception {}
+
 function sendMail(string $to, string $subject, string $html): void
 {
     $host = env('SMTP_HOST');
@@ -41,8 +46,8 @@ function sendMail(string $to, string $subject, string $html): void
 
         $mail->send();
     } catch (PHPMailerException $e) {
-        error_log('[mailer] Falha ao enviar e-mail: ' . $mail->ErrorInfo);
-        throw $e;
+        error_log('[mailer] Falha ao enviar e-mail para ' . $to . ' ("' . $subject . '"): ' . $mail->ErrorInfo);
+        throw new MailSendException('Nao foi possivel enviar o e-mail no momento. Tente novamente em alguns minutos.');
     }
 }
 
