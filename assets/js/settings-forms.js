@@ -3,18 +3,26 @@
 (function () {
   "use strict";
 
-  function flash(id) {
+  function flash(id, message) {
     var el = document.getElementById(id);
-    if (!el) return;
-    el.classList.remove("hidden");
-    setTimeout(function () { el.classList.add("hidden"); }, 3000);
+    if (el) {
+      el.classList.remove("hidden");
+      setTimeout(function () { el.classList.add("hidden"); }, 3000);
+    }
+    if (window.PsiAgenda && window.PsiAgenda.showToast) {
+      window.PsiAgenda.showToast(message || (el ? el.textContent : "Salvo com sucesso."), "success");
+    }
   }
 
   function showError(id, message) {
     var el = document.getElementById(id);
-    if (!el) return;
-    el.textContent = message;
-    el.classList.remove("hidden");
+    if (el) {
+      el.textContent = message;
+      el.classList.remove("hidden");
+    }
+    if (window.PsiAgenda && window.PsiAgenda.showToast) {
+      window.PsiAgenda.showToast(message, "error");
+    }
   }
 
   function hideError(id) {

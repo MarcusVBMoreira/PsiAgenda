@@ -25,6 +25,7 @@ const ICONS = [
     'menu' => '<path d="M4 5h16"/><path d="M4 12h16"/><path d="M4 19h16"/>',
     'chevron-left' => '<path d="m15 18-6-6 6-6"/>',
     'chevron-right' => '<path d="m9 18 6-6-6-6"/>',
+    'eye-off' => '<path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49"/><path d="M14.084 14.158a3 3 0 0 1-4.242-4.242"/><path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143"/><path d="m2 2 20 20"/>',
 ];
 
 /** Ecoa o <svg> do icone (mesmo formato lucide-react: 24x24, stroke-width 2). */

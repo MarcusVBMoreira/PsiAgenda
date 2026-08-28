@@ -15,11 +15,7 @@ if (getCurrentUser() !== null) {
     <input type="email" id="email" name="email" autocomplete="email" required
            class="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-slate-500 focus:ring-1 focus:ring-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:border-slate-400">
   </div>
-  <div>
-    <label for="password" class="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-200">Senha</label>
-    <input type="password" id="password" name="password" autocomplete="current-password" required
-           class="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-slate-500 focus:ring-1 focus:ring-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:border-slate-400">
-  </div>
+  <?php passwordField('password', 'Senha', ['autocomplete' => 'current-password', 'required' => 'required']); ?>
 
   <p id="login-error" class="hidden text-sm text-red-600 dark:text-red-400"></p>
 

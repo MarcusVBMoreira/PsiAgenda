@@ -105,9 +105,9 @@ $accessLogs = dbAll(
     <div class="border-t border-slate-100 pt-6 dark:border-slate-800">
       <p class="mb-4 text-sm font-medium text-slate-700 dark:text-slate-200">Alterar senha</p>
       <form id="password-form" class="flex flex-col gap-3">
-        <input type="password" id="currentPassword" placeholder="Senha atual" autocomplete="current-password" class="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100">
-        <input type="password" id="newPassword" placeholder="Nova senha" autocomplete="new-password" minlength="8" class="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100">
-        <input type="password" id="confirmPassword" placeholder="Confirmar nova senha" autocomplete="new-password" minlength="8" class="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100">
+        <?php passwordFieldPlain('currentPassword', 'Senha atual', ['autocomplete' => 'current-password']); ?>
+        <?php passwordFieldPlain('newPassword', 'Nova senha', ['autocomplete' => 'new-password', 'minlength' => '8']); ?>
+        <?php passwordFieldPlain('confirmPassword', 'Confirmar nova senha', ['autocomplete' => 'new-password', 'minlength' => '8']); ?>
         <p id="password-error" class="hidden text-sm text-red-600 dark:text-red-400"></p>
         <p id="password-success" class="hidden text-sm text-green-600 dark:text-green-400">Senha alterada.</p>
         <div><button type="submit" class="rounded-md bg-slate-800 px-6 py-2 text-sm font-medium text-white shadow-sm transition-all duration-150 ease-out hover:-translate-y-0.5 hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-slate-100 dark:text-slate-900">Alterar senha</button></div>

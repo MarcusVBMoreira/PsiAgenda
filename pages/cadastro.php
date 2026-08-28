@@ -23,7 +23,8 @@ function authField(string $id, string $label, string $type = 'text', array $attr
   <?php authField('fullName', 'Nome completo', 'text', ['autocomplete' => 'name', 'required' => 'required']); ?>
   <?php authField('crpNumber', 'CRP', 'text', ['placeholder' => 'Ex.: 06/221237', 'required' => 'required']); ?>
   <?php authField('email', 'E-mail', 'email', ['autocomplete' => 'email', 'required' => 'required']); ?>
-  <?php authField('password', 'Senha', 'password', ['autocomplete' => 'new-password', 'minlength' => '8', 'required' => 'required']); ?>
+  <?php passwordField('password', 'Senha', ['autocomplete' => 'new-password', 'minlength' => '8', 'required' => 'required']); ?>
+  <?php passwordField('confirmPassword', 'Confirmar senha', ['autocomplete' => 'new-password', 'minlength' => '8', 'required' => 'required']); ?>
 
   <p id="cadastro-error" class="hidden text-sm text-red-600 dark:text-red-400"></p>
 
@@ -43,13 +44,22 @@ function authField(string $id, string $label, string $type = 'text', array $attr
     var errorEl = document.getElementById('cadastro-error');
     var submitBtn = document.getElementById('cadastro-submit');
     errorEl.classList.add('hidden');
+
+    var password = document.getElementById('password').value;
+    var confirmPassword = document.getElementById('confirmPassword').value;
+    if (password !== confirmPassword) {
+      errorEl.textContent = 'As senhas nao coincidem.';
+      errorEl.classList.remove('hidden');
+      return;
+    }
+
     submitBtn.disabled = true;
 
     PsiAgenda.postJSON('/api/cadastro', {
       fullName: document.getElementById('fullName').value,
       crpNumber: document.getElementById('crpNumber').value,
       email: document.getElementById('email').value,
-      password: document.getElementById('password').value,
+      password: password,
     }).then(function (res) {
       if (!res.ok) {
         errorEl.textContent = res.data.error || 'Nao foi possivel criar a conta.';

@@ -30,11 +30,8 @@ require_once __DIR__ . '/../includes/auth-header.php';
       <input type="text" id="confirm-code" inputmode="numeric" maxlength="6" required
              class="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-slate-500 focus:ring-1 focus:ring-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:border-slate-400">
     </div>
-    <div>
-      <label for="confirm-password" class="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-200">Nova senha</label>
-      <input type="password" id="confirm-password" autocomplete="new-password" minlength="8" required
-             class="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-slate-500 focus:ring-1 focus:ring-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:border-slate-400">
-    </div>
+    <?php passwordField('confirm-password', 'Nova senha', ['autocomplete' => 'new-password', 'minlength' => '8', 'required' => 'required']); ?>
+    <?php passwordField('confirm-password-2', 'Confirmar nova senha', ['autocomplete' => 'new-password', 'minlength' => '8', 'required' => 'required']); ?>
     <p id="confirm-error" class="hidden text-sm text-red-600 dark:text-red-400"></p>
     <button type="submit" id="confirm-submit"
             class="w-full rounded-md bg-slate-800 px-4 py-2 text-sm font-medium text-white shadow-sm transition-all duration-150 ease-out hover:-translate-y-0.5 hover:bg-slate-700 hover:shadow disabled:cursor-not-allowed disabled:opacity-60 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white">
@@ -86,12 +83,21 @@ require_once __DIR__ . '/../includes/auth-header.php';
     var errorEl = document.getElementById('confirm-error');
     var submitBtn = document.getElementById('confirm-submit');
     errorEl.classList.add('hidden');
+
+    var newPassword = document.getElementById('confirm-password').value;
+    var newPassword2 = document.getElementById('confirm-password-2').value;
+    if (newPassword !== newPassword2) {
+      errorEl.textContent = 'As senhas nao coincidem.';
+      errorEl.classList.remove('hidden');
+      return;
+    }
+
     submitBtn.disabled = true;
 
     PsiAgenda.postJSON('/api/recuperar-senha-confirmar', {
       email: emailForConfirm,
       code: document.getElementById('confirm-code').value,
-      newPassword: document.getElementById('confirm-password').value,
+      newPassword: newPassword,
     }).then(function (res) {
       submitBtn.disabled = false;
       if (!res.ok) {

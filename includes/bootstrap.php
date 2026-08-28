@@ -11,5 +11,6 @@ require_once __DIR__ . '/../app/access_log.php';
 require_once __DIR__ . '/../app/date_helpers.php';
 require_once __DIR__ . '/../app/format_helpers.php';
 require_once __DIR__ . '/../app/icons.php';
+require_once __DIR__ . '/../app/form_helpers.php';
 
 startAppSession();
