@@ -1,0 +1,13 @@
+{
+  "name": "psiagenda-css-build",
+  "private": true,
+  "description": "Ferramenta de build LOCAL apenas — compila assets/css/app.css a partir de classes Tailwind usadas nos arquivos PHP/JS do projeto. Nada aqui roda no servidor de producao; o arquivo gerado (../../assets/css/app.css) e um CSS estatico normal.",
+  "scripts": {
+    "build": "tailwindcss -i ./input.css -o ../../assets/css/app.css --minify",
+    "watch": "tailwindcss -i ./input.css -o ../../assets/css/app.css --watch"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.1.16",
+    "tailwindcss": "^4.1.16"
+  }
+}

@@ -1,0 +1,35 @@
+# URLs amigaveis (sem RewriteBase fixo: funciona tanto em localhost/PsiAgenda/
+# quanto na raiz do dominio de producao) + bloqueio de pastas internas.
+
+RewriteEngine On
+
+# Nunca serve os internals diretamente por URL.
+RewriteRule ^(app|migrations|build-tools|vendor|storage|includes)(/|$) - [F,L]
+RewriteRule ^composer\.(json|lock)$ - [F,L]
+RewriteRule ^\.env - [F,L]
+
+# api/xxx -> api/xxx.php , cron/xxx -> cron/xxx.php
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^api/([a-zA-Z0-9_\-]+)/?$ api/$1.php [L,QSA]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^cron/([a-zA-Z0-9_\-]+)/?$ cron/$1.php [L,QSA]
+
+# Paginas com nome de rota diferente do arquivo (subpastas na URL).
+RewriteRule ^login/verificar/?$ pages/login-verificar.php [L,QSA]
+RewriteRule ^agenda/novo/?$ pages/agenda-novo.php [L,QSA]
+RewriteRule ^agenda/([0-9a-fA-F-]+)/registro/?$ pages/agenda-registro.php?session=$1 [L,QSA]
+RewriteRule ^pacientes/novo/?$ pages/pacientes-novo.php [L,QSA]
+RewriteRule ^pacientes/([0-9a-fA-F-]+)/visualizar/?$ pages/pacientes-visualizar.php?id=$1 [L,QSA]
+RewriteRule ^pacientes/([0-9a-fA-F-]+)/documentos/novo/?$ pages/pacientes-documentos-novo.php?id=$1 [L,QSA]
+RewriteRule ^pacientes/([0-9a-fA-F-]+)/?$ pages/pacientes-editar.php?id=$1 [L,QSA]
+
+# Paginas 1:1 com o nome do arquivo em pages/.
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^([a-zA-Z0-9_\-]+)/?$ pages/$1.php [L,QSA]
+
+<IfModule mod_headers.c>
+  <FilesMatch "\.(env|sql)$">
+    Header set X-Robots-Tag "noindex"
+  </FilesMatch>
+</IfModule>

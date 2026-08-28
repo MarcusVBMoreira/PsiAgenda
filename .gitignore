@@ -2,6 +2,8 @@
 
 # dependencies
 /node_modules
+/build-tools/tailwind/node_modules
+/vendor
 /.pnp
 .pnp.*
 .yarn/*
