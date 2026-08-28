@@ -16,6 +16,20 @@ use PHPMailer\PHPMailer\Exception as PHPMailerException;
 // devolvendo uma pagina de erro em HTML pro frontend).
 class MailSendException extends Exception {}
 
+/**
+ * SMTP_FROM aceita tanto um e-mail puro ("a@b.com") quanto o formato
+ * "Nome <a@b.com>". PHPMailer::setFrom() espera o endereco separado do
+ * nome — passar a string inteira como endereco falha na validacao e
+ * lanca excecao. Retorna [endereco, nome|null].
+ */
+function parseFromAddress(string $value): array
+{
+    if (preg_match('/^(.*)<(.+)>$/', trim($value), $m)) {
+        return [trim($m[2]), trim($m[1], " \t\"") ?: null];
+    }
+    return [trim($value), null];
+}
+
 function sendMail(string $to, string $subject, string $html): void
 {
     $host = env('SMTP_HOST');
@@ -37,8 +51,8 @@ function sendMail(string $to, string $subject, string $html): void
         $mail->SMTPSecure = envBool('SMTP_SECURE') ? PHPMailer::ENCRYPTION_SMTPS : PHPMailer::ENCRYPTION_STARTTLS;
         $mail->CharSet = 'UTF-8';
 
-        $from = env('SMTP_FROM', $user);
-        $mail->setFrom($from, 'PsiAgenda');
+        [$fromAddress, $fromName] = parseFromAddress(env('SMTP_FROM', $user));
+        $mail->setFrom($fromAddress, $fromName ?? 'PsiAgenda');
         $mail->addAddress($to);
         $mail->isHTML(true);
         $mail->Subject = $subject;
