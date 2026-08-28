@@ -6,10 +6,8 @@
 
 declare(strict_types=1);
 
-function isValidEmail(string $email): bool
-{
-    return filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
-}
+// isValidEmail() vive em app/format_helpers.php (carregado por
+// includes/bootstrap.php em toda pagina/endpoint).
 
 function validateLogin(array $input): array
 {

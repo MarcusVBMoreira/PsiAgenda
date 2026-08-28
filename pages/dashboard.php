@@ -37,21 +37,7 @@ foreach ($todaySessions as $s) {
     }
 }
 
-const STATUS_LABELS = [
-    'livre' => 'Livre', 'pendente' => 'Pendente', 'confirmado' => 'Confirmado',
-    'finalizada' => 'Finalizada', 'reagendado' => 'Reagendado',
-    'cancelado_cobrado' => 'Cancelado (cobrado)', 'cancelado_sem_cobranca' => 'Cancelado (sem cobranca)',
-];
-const STATUS_BADGE_CLASSES = [
-    'livre' => 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400',
-    'pendente' => 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300',
-    'confirmado' => 'bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-300',
-    'finalizada' => 'bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300',
-    'reagendado' => 'bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300',
-    'cancelado_cobrado' => 'bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300',
-    'cancelado_sem_cobranca' => 'bg-slate-200 text-slate-600 dark:bg-slate-800 dark:text-slate-400',
-];
-const MODALITY_LABELS = ['presencial' => 'Presencial', 'online' => 'Online'];
+require_once __DIR__ . '/../app/session_meta.php';
 
 $firstName = explode(' ', $__user['fullName'])[0];
 ?>

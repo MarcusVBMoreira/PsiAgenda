@@ -29,3 +29,8 @@ function h(?string $value): string
 {
     return htmlspecialchars($value ?? '', ENT_QUOTES, 'UTF-8');
 }
+
+function isValidEmail(string $email): bool
+{
+    return filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
+}
