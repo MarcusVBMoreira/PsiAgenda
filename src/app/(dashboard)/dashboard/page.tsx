@@ -145,16 +145,16 @@ export default async function DashboardPage() {
                   </div>
                 </div>
                 <div className="relative z-10 flex shrink-0 items-center gap-2">
-                  <IconLink
-                    href={`/pacientes/${session.patient_id}/visualizar`}
-                    icon={Eye}
-                    label="Ver perfil do paciente"
-                  />
                   <span
                     className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_BADGE_CLASSES[session.status] ?? "bg-slate-100 text-slate-600"}`}
                   >
                     {STATUS_LABELS[session.status] ?? session.status}
                   </span>
+                  <IconLink
+                    href={`/pacientes/${session.patient_id}/visualizar`}
+                    icon={Eye}
+                    label="Ver perfil do paciente"
+                  />
                 </div>
               </div>
             ))}

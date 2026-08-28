@@ -171,16 +171,16 @@ export default async function AlertasPage() {
                   </p>
                 </div>
                 <div className="flex shrink-0 items-center gap-2">
-                  <IconLink
-                    href={`/pacientes/${reminder.patient_id}/visualizar`}
-                    icon={Eye}
-                    label="Ver perfil do paciente"
-                  />
                   <span
                     className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${REMINDER_STATUS_BADGE[reminder.status] ?? "bg-slate-100 text-slate-600"}`}
                   >
                     {reminder.status}
                   </span>
+                  <IconLink
+                    href={`/pacientes/${reminder.patient_id}/visualizar`}
+                    icon={Eye}
+                    label="Ver perfil do paciente"
+                  />
                 </div>
               </div>
             ))}

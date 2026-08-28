@@ -78,8 +78,8 @@ export default function SessionListItem({
         </div>
       </div>
       <div className="relative z-10 flex shrink-0 items-center gap-2">
-        <IconLink href={`/pacientes/${session.patient_id}/visualizar`} icon={Eye} label="Ver perfil do paciente" />
         <StatusBadge status={session.status} className="px-2.5 py-0.5 text-xs" />
+        <IconLink href={`/pacientes/${session.patient_id}/visualizar`} icon={Eye} label="Ver perfil do paciente" />
       </div>
     </div>
   );
